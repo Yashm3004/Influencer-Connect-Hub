@@ -1,10 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Sparkles, Compass, CalendarCheck, BarChart3 } from "lucide-react";
+import { Sparkles, Compass, CalendarCheck, BarChart3, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Show, useUser, useClerk } from "@clerk/react";
 
 export function Navbar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
   const isActive = (path: string) => {
     return location === path || location.startsWith(`${path}/`);
@@ -40,12 +43,47 @@ export function Navbar() {
               </div>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/explore">
-              <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                Find Talent
-              </Button>
-            </Link>
+          <div className="flex items-center gap-3">
+            <Show when="signed-in">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-sm text-white/80">
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    {user?.imageUrl ? (
+                      <img src={user.imageUrl} alt={user.fullName ?? ""} className="h-6 w-6 rounded-full object-cover" />
+                    ) : (
+                      <User className="h-3.5 w-3.5 text-primary" />
+                    )}
+                  </div>
+                  <span className="hidden sm:inline max-w-[120px] truncate">
+                    {user?.firstName ?? user?.emailAddresses?.[0]?.emailAddress ?? "Account"}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-white gap-2"
+                  onClick={() => signOut(() => setLocation("/"))}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sign out</span>
+                </Button>
+              </div>
+            </Show>
+            <Show when="signed-out">
+              <div className="flex items-center gap-2">
+                <Link href="/sign-in">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white gap-2">
+                    <LogIn className="h-4 w-4" />
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/explore">
+                  <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_rgba(0,229,255,0.3)]">
+                    Find Talent
+                  </Button>
+                </Link>
+              </div>
+            </Show>
           </div>
         </div>
       </div>
