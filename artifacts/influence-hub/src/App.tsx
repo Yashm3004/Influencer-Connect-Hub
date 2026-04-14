@@ -14,6 +14,7 @@ import TalentProfile from "@/pages/talent-profile";
 import Bookings from "@/pages/bookings";
 import BookingDetail from "@/pages/booking-detail";
 import Dashboard from "@/pages/dashboard";
+import JoinAsInfluencer from "@/pages/join-as-influencer";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -136,6 +137,7 @@ function Router() {
           <Route path="/bookings" component={Bookings} />
           <Route path="/bookings/:id" component={BookingDetail} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/join" component={JoinAsInfluencer} />
           <Route component={NotFound} />
         </Switch>
       </main>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Sparkles, Compass, CalendarCheck, BarChart3, LogIn, LogOut, User } from "lucide-react";
+import { Sparkles, Compass, CalendarCheck, BarChart3, LogIn, LogOut, User, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Show, useUser, useClerk } from "@clerk/react";
 
@@ -40,6 +40,12 @@ export function Navbar() {
               <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/5 hover:text-white ${isActive("/dashboard") ? "bg-white/10 text-white" : "text-muted-foreground"}`}>
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
+              </div>
+            </Link>
+            <Link href="/join">
+              <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/5 hover:text-white ${isActive("/join") ? "bg-white/10 text-white" : "text-muted-foreground"}`}>
+                <PlusCircle className="h-4 w-4" />
+                Join as Influencer
               </div>
             </Link>
           </div>
