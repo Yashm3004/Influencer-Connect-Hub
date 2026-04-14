@@ -16,6 +16,25 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Applications
+
+### InfluenceHub (`artifacts/influence-hub`)
+A marketplace platform where business owners can discover and book influencers, YouTubers, fashion models, and celebrities for brand promotions and advertisements.
+
+- **Frontend**: React + Vite, Tailwind CSS, Framer Motion, dark electric theme
+- **Backend**: Express 5 API server, PostgreSQL
+- **Preview path**: `/`
+
+**Pages:**
+- `/` — Home: hero, featured talents, categories, how it works, stats
+- `/explore` — Talent search with filters (category, name, budget)
+- `/talent/:id` — Talent profile + booking request form
+- `/bookings` — List all bookings with status filter
+- `/bookings/:id` — Booking detail + messaging between business and manager
+- `/dashboard` — Platform analytics, stats, category chart, recent activity
+
+**Data Models:** talents, bookings, messages, reviews, categories, activity
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages

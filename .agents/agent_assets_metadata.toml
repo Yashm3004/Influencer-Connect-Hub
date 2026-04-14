@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "PsgkAa2WAbSj_3fCYx4mq"
+uri = "file://artifacts/influence-hub/public/images/hero-bg.png"
+type = "image"
+title = "high stakes talent agency hero"
+
+[[generated]]
+id = "Pe5jFiohwbUJkx8pum5DK"
+uri = "file://artifacts/influence-hub/public/images/avatar-1.png"
+type = "image"
+title = "female influencer avatar"
+
+[[generated]]
+id = "--s3YfWZwYq1lq_0bu8F9"
+uri = "file://artifacts/influence-hub/public/images/avatar-2.png"
+type = "image"
+title = "male youtuber avatar"
+
+[[generated]]
+id = "pn_Lq99PHtYXCt_8ve44f"
+uri = "file://artifacts/influence-hub/public/images/avatar-3.png"
+type = "image"
+title = "female celebrity avatar"

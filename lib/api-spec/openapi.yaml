@@ -3,13 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: InfluenceHub API - Connect businesses with influencers, YouTubers, fashion models and celebrities
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: talents
+    description: Talent management
+  - name: bookings
+    description: Booking management
+  - name: categories
+    description: Category operations
+  - name: messages
+    description: Messaging between clients and talent managers
+  - name: reviews
+    description: Reviews and ratings
+  - name: stats
+    description: Platform statistics and analytics
+
 paths:
   /healthz:
     get:
@@ -24,6 +37,305 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /talents:
+    get:
+      operationId: listTalents
+      tags: [talents]
+      summary: List all talents
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: minFollowers
+          in: query
+          schema:
+            type: integer
+        - name: maxRate
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of talents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Talent"
+    post:
+      operationId: createTalent
+      tags: [talents]
+      summary: Create a talent profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTalentBody"
+      responses:
+        "201":
+          description: Created talent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Talent"
+
+  /talents/{id}:
+    get:
+      operationId: getTalent
+      tags: [talents]
+      summary: Get a talent by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Talent profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Talent"
+        "404":
+          description: Not found
+
+  /talents/featured:
+    get:
+      operationId: getFeaturedTalents
+      tags: [talents]
+      summary: Get featured/top talents
+      responses:
+        "200":
+          description: Featured talents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Talent"
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List all bookings
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a booking request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingBody"
+      responses:
+        "201":
+          description: Created booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get a booking by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    patch:
+      operationId: updateBooking
+      tags: [bookings]
+      summary: Update booking status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingBody"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all talent categories
+      responses:
+        "200":
+          description: List of categories with counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /messages:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      summary: List messages for a booking
+      parameters:
+        - name: bookingId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: createMessage
+      tags: [messages]
+      summary: Send a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageBody"
+      responses:
+        "201":
+          description: Created message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /reviews:
+    get:
+      operationId: listReviews
+      tags: [reviews]
+      summary: List reviews for a talent
+      parameters:
+        - name: talentId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Create a review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewBody"
+      responses:
+        "201":
+          description: Created review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /stats/platform:
+    get:
+      operationId: getPlatformStats
+      tags: [stats]
+      summary: Get overall platform statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /stats/bookings-by-category:
+    get:
+      operationId: getBookingsByCategory
+      tags: [stats]
+      summary: Get booking counts by category
+      responses:
+        "200":
+          description: Bookings by category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryStat"
+
+  /stats/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [stats]
+      summary: Get recent platform activity
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +346,340 @@ components:
       required:
         - status
 
+    Talent:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+          enum: [influencer, youtuber, fashion_model, celebrity, brand_ambassador]
+        bio:
+          type: string
+        profileImageUrl:
+          type: string
+        coverImageUrl:
+          type: string
+        followerCount:
+          type: integer
+        engagementRate:
+          type: number
+        ratePerPost:
+          type: number
+        ratePerCampaign:
+          type: number
+        platforms:
+          type: array
+          items:
+            type: string
+        niche:
+          type: string
+        location:
+          type: string
+        verified:
+          type: boolean
+        available:
+          type: boolean
+        managerName:
+          type: string
+        managerEmail:
+          type: string
+        avgRating:
+          type: number
+        totalBookings:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - bio
+        - followerCount
+        - ratePerPost
+        - verified
+        - available
+        - createdAt
+
+    CreateTalentBody:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        bio:
+          type: string
+        profileImageUrl:
+          type: string
+        followerCount:
+          type: integer
+        engagementRate:
+          type: number
+        ratePerPost:
+          type: number
+        ratePerCampaign:
+          type: number
+        platforms:
+          type: array
+          items:
+            type: string
+        niche:
+          type: string
+        location:
+          type: string
+        managerName:
+          type: string
+        managerEmail:
+          type: string
+      required:
+        - name
+        - category
+        - bio
+        - followerCount
+        - ratePerPost
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        talentId:
+          type: integer
+        talent:
+          $ref: "#/components/schemas/Talent"
+        businessName:
+          type: string
+        businessEmail:
+          type: string
+        campaignName:
+          type: string
+        campaignDescription:
+          type: string
+        budget:
+          type: number
+        status:
+          type: string
+          enum: [pending, accepted, rejected, completed, cancelled]
+        campaignType:
+          type: string
+          enum: [social_post, video_review, brand_ambassador, live_event, product_launch]
+        startDate:
+          type: string
+        endDate:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - talentId
+        - businessName
+        - businessEmail
+        - campaignName
+        - budget
+        - status
+        - createdAt
+
+    CreateBookingBody:
+      type: object
+      properties:
+        talentId:
+          type: integer
+        businessName:
+          type: string
+        businessEmail:
+          type: string
+        campaignName:
+          type: string
+        campaignDescription:
+          type: string
+        budget:
+          type: number
+        campaignType:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+      required:
+        - talentId
+        - businessName
+        - businessEmail
+        - campaignName
+        - budget
+        - campaignType
+
+    UpdateBookingBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, accepted, rejected, completed, cancelled]
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        iconName:
+          type: string
+        talentCount:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+        - talentCount
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookingId:
+          type: integer
+        senderName:
+          type: string
+        senderRole:
+          type: string
+          enum: [business, manager]
+        content:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - bookingId
+        - senderName
+        - senderRole
+        - content
+        - createdAt
+
+    CreateMessageBody:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+        senderName:
+          type: string
+        senderRole:
+          type: string
+        content:
+          type: string
+      required:
+        - bookingId
+        - senderName
+        - senderRole
+        - content
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        talentId:
+          type: integer
+        bookingId:
+          type: integer
+        reviewerName:
+          type: string
+        reviewerCompany:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - talentId
+        - reviewerName
+        - rating
+        - createdAt
+
+    CreateReviewBody:
+      type: object
+      properties:
+        talentId:
+          type: integer
+        bookingId:
+          type: integer
+        reviewerName:
+          type: string
+        reviewerCompany:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+      required:
+        - talentId
+        - reviewerName
+        - rating
+
+    PlatformStats:
+      type: object
+      properties:
+        totalTalents:
+          type: integer
+        totalBookings:
+          type: integer
+        totalBusinesses:
+          type: integer
+        completedCampaigns:
+          type: integer
+        totalRevenue:
+          type: number
+        activeBookings:
+          type: integer
+      required:
+        - totalTalents
+        - totalBookings
+        - totalBusinesses
+        - completedCampaigns
+        - totalRevenue
+        - activeBookings
+
+    CategoryStat:
+      type: object
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+        totalRevenue:
+          type: number
+      required:
+        - category
+        - count
+        - totalRevenue
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [booking_created, booking_accepted, booking_completed, talent_joined, review_posted]
+        description:
+          type: string
+        entityName:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - description
+        - entityName
+        - createdAt
