@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "wouter";
-import { ArrowLeft, Star, Shield, MapPin, Users, TrendingUp, MessageCircle, CheckCircle, Send } from "lucide-react";
+import { ArrowLeft, Star, Shield, MapPin, Users, TrendingUp, MessageCircle, CheckCircle, Send, Pencil, X, IndianRupee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGetTalent, useListReviews, useCreateBooking, getGetTalentQueryKey, getListReviewsQueryKey } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { formatINR } from "@/lib/inr";
 
 function formatFollowers(count: number): string {
   if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
@@ -29,8 +31,17 @@ export default function TalentProfile() {
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id, 10);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [showEditRates, setShowEditRates] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    managerEmail: "",
+    ratePerPost: "",
+    ratePerCampaign: "",
+    available: true,
+  });
   const [form, setForm] = useState({
     businessName: "",
     businessEmail: "",
@@ -41,6 +52,33 @@ export default function TalentProfile() {
     startDate: "",
     endDate: "",
   });
+
+  const handleSaveRates = async () => {
+    if (!talent) return;
+    if (editForm.managerEmail !== talent.managerEmail) {
+      toast({ title: "Email mismatch", description: "The manager email you entered doesn't match our records.", variant: "destructive" });
+      return;
+    }
+    setEditSaving(true);
+    try {
+      const body: Record<string, unknown> = { available: editForm.available };
+      if (editForm.ratePerPost) body.ratePerPost = Number(editForm.ratePerPost);
+      if (editForm.ratePerCampaign) body.ratePerCampaign = Number(editForm.ratePerCampaign);
+      const res = await fetch(`/api/talents/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Failed");
+      await queryClient.invalidateQueries({ queryKey: getGetTalentQueryKey(id) });
+      setShowEditRates(false);
+      toast({ title: "Rates updated!", description: "Your profile has been updated successfully." });
+    } catch {
+      toast({ title: "Update failed", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   const { data: talent, isLoading: talentLoading } = useGetTalent(id, {
     query: { enabled: !!id, queryKey: getGetTalentQueryKey(id) },
@@ -179,15 +217,33 @@ export default function TalentProfile() {
 
             {/* Pricing */}
             <div className="bg-card border border-white/5 rounded-2xl p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Pricing</h3>
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Pricing</h3>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-primary gap-1"
+                  onClick={() => {
+                    setEditForm({
+                      managerEmail: "",
+                      ratePerPost: String(talent.ratePerPost),
+                      ratePerCampaign: talent.ratePerCampaign ? String(talent.ratePerCampaign) : "",
+                      available: talent.available,
+                    });
+                    setShowEditRates(true);
+                  }}
+                >
+                  <Pencil className="h-3 w-3" /> Edit Rates
+                </Button>
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">Per Post</span>
-                <span className="font-black text-primary text-lg">${talent.ratePerPost.toLocaleString()}</span>
+                <span className="font-black text-primary text-lg">{formatINR(talent.ratePerPost)}</span>
               </div>
               {talent.ratePerCampaign && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground text-sm">Full Campaign</span>
-                  <span className="font-black text-secondary text-lg">${talent.ratePerCampaign.toLocaleString()}</span>
+                  <span className="font-black text-secondary text-lg">{formatINR(talent.ratePerCampaign)}</span>
                 </div>
               )}
             </div>
@@ -277,8 +333,8 @@ export default function TalentProfile() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-muted-foreground text-sm">Budget (USD) *</Label>
-                      <Input required type="number" min="1" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="10000" className="bg-background border-white/10 text-white" />
+                      <Label className="text-muted-foreground text-sm">Budget (₹) *</Label>
+                      <Input required type="number" min="1" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="50000" className="bg-background border-white/10 text-white" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-muted-foreground text-sm">Campaign Type *</Label>
@@ -357,6 +413,108 @@ export default function TalentProfile() {
           </div>
         </motion.div>
       </div>
+
+      {/* Edit Rates Modal */}
+      <AnimatePresence>
+        {showEditRates && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowEditRates(false)} />
+            <motion.div
+              className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[hsl(240_10%_7%)] p-6 shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="text-xl font-bold text-white">Edit Your Rates</h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">Update fees and availability for {talent?.name}</p>
+                </div>
+                <button onClick={() => setShowEditRates(false)} className="text-muted-foreground hover:text-white transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-white/80 text-sm">Manager Email (to verify identity) *</Label>
+                  <Input
+                    type="email"
+                    value={editForm.managerEmail}
+                    onChange={(e) => setEditForm({ ...editForm, managerEmail: e.target.value })}
+                    placeholder="Enter your registered manager email"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-white/80 text-sm flex items-center gap-1">
+                      <IndianRupee className="h-3.5 w-3.5 text-primary" /> Rate per Post
+                    </Label>
+                    <Input
+                      type="number"
+                      value={editForm.ratePerPost}
+                      onChange={(e) => setEditForm({ ...editForm, ratePerPost: e.target.value })}
+                      placeholder="e.g. 25000"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-white/80 text-sm flex items-center gap-1">
+                      <IndianRupee className="h-3.5 w-3.5 text-primary" /> Rate per Campaign
+                    </Label>
+                    <Input
+                      type="number"
+                      value={editForm.ratePerCampaign}
+                      onChange={(e) => setEditForm({ ...editForm, ratePerCampaign: e.target.value })}
+                      placeholder="e.g. 150000"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <div>
+                    <div className="text-sm font-medium text-white">Available for Bookings</div>
+                    <div className="text-xs text-muted-foreground">Toggle off to pause new booking requests</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditForm({ ...editForm, available: !editForm.available })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${editForm.available ? "bg-primary" : "bg-white/20"}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${editForm.available ? "translate-x-6" : "translate-x-1"}`} />
+                  </button>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button variant="ghost" className="flex-1 text-muted-foreground hover:text-white" onClick={() => setShowEditRates(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1 bg-primary text-primary-foreground font-bold hover:bg-primary/90 gap-2"
+                    onClick={handleSaveRates}
+                    disabled={!editForm.managerEmail || editSaving}
+                  >
+                    {editSaving ? (
+                      <span className="flex items-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Saving…
+                      </span>
+                    ) : "Save Changes"}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

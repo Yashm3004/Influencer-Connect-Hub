@@ -75,6 +75,24 @@ router.post("/talents", async (req, res): Promise<void> => {
   res.status(201).json(GetTalentResponse.parse(mapTalent(talent)));
 });
 
+router.patch("/talents/:id", async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const allowed = ["ratePerPost", "ratePerCampaign", "available", "bio", "niche", "location", "platforms", "managerName", "managerEmail", "profileImageUrl", "engagementRate", "followerCount"];
+  const updates: Record<string, unknown> = {};
+  for (const key of allowed) {
+    if (key in req.body) updates[key] = req.body[key];
+  }
+
+  if (Object.keys(updates).length === 0) { res.status(400).json({ error: "No valid fields to update" }); return; }
+
+  const [talent] = await db.update(talentsTable).set(updates).where(eq(talentsTable.id, id)).returning();
+  if (!talent) { res.status(404).json({ error: "Talent not found" }); return; }
+
+  res.json(GetTalentResponse.parse(mapTalent(talent)));
+});
+
 router.get("/talents/:id", async (req, res): Promise<void> => {
   const params = GetTalentParams.safeParse(req.params);
   if (!params.success) {

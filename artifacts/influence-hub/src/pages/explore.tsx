@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Search, Filter, Star, Shield, Users } from "lucide-react";
+import { formatINR } from "@/lib/inr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,10 +31,10 @@ const CATEGORIES = [
 
 const RATE_FILTERS = [
   { value: "all", label: "Any Budget" },
-  { value: "5000", label: "Up to $5,000" },
-  { value: "10000", label: "Up to $10,000" },
-  { value: "25000", label: "Up to $25,000" },
-  { value: "50000", label: "Up to $50,000" },
+  { value: "25000", label: "Up to ₹25,000" },
+  { value: "100000", label: "Up to ₹1,00,000" },
+  { value: "500000", label: "Up to ₹5,00,000" },
+  { value: "1000000", label: "Up to ₹10,00,000" },
 ];
 
 export default function Explore() {
@@ -208,7 +209,7 @@ export default function Explore() {
                         </div>
                         <div className="text-right">
                           <div className="text-xs text-muted-foreground">Per Post</div>
-                          <div className="text-sm font-bold text-primary">${talent.ratePerPost.toLocaleString()}</div>
+                          <div className="text-sm font-bold text-primary">{formatINR(talent.ratePerPost)}</div>
                         </div>
                       </div>
                     </div>
