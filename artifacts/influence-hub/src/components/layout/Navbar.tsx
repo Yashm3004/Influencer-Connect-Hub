@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Sparkles, Compass, CalendarCheck, BarChart3, LogIn, LogOut, User, PlusCircle } from "lucide-react";
+import { Sparkles, Compass, CalendarCheck, BarChart3, LogIn, LogOut, User, PlusCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Show, useUser, useClerk } from "@clerk/react";
 
@@ -49,11 +49,11 @@ export function Navbar() {
               </div>
             </Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Show when="signed-in">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-sm text-white/80">
-                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
                     {user?.imageUrl ? (
                       <img src={user.imageUrl} alt={user.fullName ?? ""} className="h-6 w-6 rounded-full object-cover" />
                     ) : (
@@ -78,13 +78,23 @@ export function Navbar() {
             <Show when="signed-out">
               <div className="flex items-center gap-2">
                 <Link href="/sign-in">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white gap-2">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white gap-1.5">
                     <LogIn className="h-4 w-4" />
-                    Sign in
+                    <span className="hidden sm:inline">Sign in</span>
+                  </Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/40 text-primary hover:bg-primary/10 hover:border-primary gap-1.5 font-semibold"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Register</span>
                   </Button>
                 </Link>
                 <Link href="/explore">
-                  <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_rgba(0,229,255,0.3)]">
+                  <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_rgba(0,229,255,0.3)] hidden md:flex">
                     Find Talent
                   </Button>
                 </Link>
