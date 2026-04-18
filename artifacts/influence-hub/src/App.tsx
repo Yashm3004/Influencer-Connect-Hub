@@ -71,6 +71,7 @@ const SIGN_IN_BENEFITS = [
 ];
 
 const SIGN_UP_BENEFITS = [
+  { icon: "📲", text: "OTP sent to your email or mobile to verify" },
   { icon: "🚀", text: "List your brand and start booking today" },
   { icon: "🤝", text: "Connect with India's top influencers" },
   { icon: "💰", text: "All pricing in ₹ INR, no hidden fees" },
@@ -165,12 +166,22 @@ function SignUpPage() {
   return (
     <AuthLayout
       title="Register as a Customer"
-      subtitle="Create your free account and start booking India's top influencers, YouTubers, and celebrities for your brand."
+      subtitle="Create your free account in seconds. Enter your email or mobile number and we'll send you a one-time OTP to verify."
       benefits={SIGN_UP_BENEFITS}
       footerText="Already have an account?"
       footerLink="/sign-in"
       footerLabel="Sign in →"
+
     >
+      <div className="mb-5 flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+        <span className="text-xl mt-0.5">📲</span>
+        <div>
+          <p className="text-sm font-semibold text-white">OTP Verification Included</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            After you enter your details, a one-time verification code will be sent to your email (or mobile number if enabled) to confirm your account.
+          </p>
+        </div>
+      </div>
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
