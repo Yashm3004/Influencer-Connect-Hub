@@ -50,16 +50,18 @@ function ScrollToTop() {
 const clerkAppearance = {
   variables: {
     colorPrimary: "hsl(186 100% 50%)",
-    colorBackground: "hsl(240 10% 7%)",
-    colorInputBackground: "hsl(240 10% 10%)",
+    colorBackground: "hsl(240 12% 10%)",
+    colorInputBackground: "hsl(240 10% 15%)",
     colorText: "white",
-    colorTextSecondary: "hsl(240 5% 64%)",
+    colorTextSecondary: "hsl(240 5% 70%)",
     borderRadius: "0.75rem",
   },
   elements: {
-    card: "shadow-2xl border border-white/10 !bg-transparent",
-    formButtonPrimary: "bg-primary hover:bg-primary/90 font-bold",
+    card: "shadow-2xl !bg-transparent border-0",
+    formButtonPrimary: "!bg-gradient-to-r !from-cyan-400 !to-purple-500 hover:!opacity-90 font-bold !border-0",
     rootBox: "w-full",
+    formFieldInput: "!border-white/20 focus:!border-cyan-400",
+    socialButtonsBlockButton: "!border-white/20 hover:!border-white/40",
   },
 };
 
@@ -88,47 +90,74 @@ function AuthLayout({ children, title, subtitle, benefits, footerText, footerLin
   footerLabel: string;
 }) {
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left panel — branding & benefits */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col justify-between p-12 bg-gradient-to-br from-primary/10 via-secondary/5 to-background border-r border-white/5">
-        <div>
-          <div className="flex items-center gap-2 mb-12">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-black font-black text-lg">✦</span>
+    <div className="min-h-screen flex">
+      {/* Left panel — vivid gradient branding */}
+      <div className="hidden lg:flex lg:w-[48%] xl:w-[45%] flex-col justify-between relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #00e5ff 0%, #7c3aed 55%, #0a0a1a 100%)" }}>
+        {/* Decorative blobs */}
+        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full opacity-30"
+          style={{ background: "radial-gradient(circle, #ffffff55 0%, transparent 70%)" }} />
+        <div className="absolute bottom-10 right-0 h-96 w-96 rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, #a855f755 0%, transparent 70%)" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle, #00e5ff33 0%, transparent 60%)" }} />
+
+        <div className="relative z-10 p-12">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-14">
+            <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-xl">✦</span>
             </div>
-            <span className="text-xl font-bold text-white">Influence<span className="text-primary">Hub</span></span>
+            <span className="text-2xl font-extrabold text-white tracking-tight">Influence<span className="text-cyan-200">Hub</span></span>
           </div>
-          <h2 className="text-3xl font-extrabold text-white leading-tight mb-3">{title}</h2>
-          <p className="text-muted-foreground text-base mb-10 leading-relaxed">{subtitle}</p>
-          <ul className="space-y-4">
+
+          <h2 className="text-4xl font-extrabold text-white leading-tight mb-4 drop-shadow-lg">{title}</h2>
+          <p className="text-white/80 text-base mb-10 leading-relaxed max-w-xs">{subtitle}</p>
+
+          <ul className="space-y-5">
             {benefits.map((b, i) => (
-              <li key={i} className="flex items-center gap-3">
-                <span className="text-2xl">{b.icon}</span>
-                <span className="text-white/80 text-sm">{b.text}</span>
+              <li key={i} className="flex items-center gap-4">
+                <div className="h-10 w-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center flex-shrink-0 shadow">
+                  <span className="text-xl">{b.icon}</span>
+                </div>
+                <span className="text-white font-medium text-sm">{b.text}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="text-xs text-muted-foreground/60 flex items-center gap-2">
-          <span className="h-1 w-1 rounded-full bg-primary inline-block" />
-          Trusted by brands across India
+
+        <div className="relative z-10 px-12 pb-10 flex items-center gap-3">
+          <div className="h-px flex-1 bg-white/20" />
+          <span className="text-white/60 text-xs font-medium tracking-wide">Trusted by brands across India</span>
+          <div className="h-px flex-1 bg-white/20" />
         </div>
       </div>
 
-      {/* Right panel — auth form */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+      {/* Right panel — dark form area */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 bg-[hsl(240_10%_6%)]">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 justify-center mb-8 lg:hidden">
-            <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-black font-black">✦</span>
+            <div className="h-9 w-9 rounded-xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, #00e5ff, #7c3aed)" }}>
+              <span className="text-white font-black text-lg">✦</span>
             </div>
-            <span className="text-lg font-bold text-white">Influence<span className="text-primary">Hub</span></span>
+            <span className="text-xl font-extrabold text-white">Influence<span className="text-cyan-400">Hub</span></span>
           </div>
-          {children}
-          <p className="text-center text-sm text-muted-foreground mt-6">
+
+          {/* Glow card behind form */}
+          <div className="relative rounded-2xl p-[1px]"
+            style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.25), rgba(124,58,237,0.25))" }}>
+            <div className="rounded-2xl bg-[hsl(240_10%_9%)] px-6 py-6">
+              {children}
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-white/50 mt-6">
             {footerText}{" "}
-            <a href={`${basePath}${footerLink}`} className="text-primary hover:underline font-medium">
+            <a href={`${basePath}${footerLink}`}
+              className="font-semibold text-transparent bg-clip-text hover:opacity-80 transition"
+              style={{ backgroundImage: "linear-gradient(90deg, #00e5ff, #a855f7)" }}>
               {footerLabel}
             </a>
           </p>
